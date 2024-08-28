@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ericsson.litp</groupId>
+        <artifactId>integration</artifactId>
+        <version>2.47.1</version>
+    </parent>
+
+    <groupId>com.ericsson.oss.litp</groupId>
+    <artifactId>ERIClitpbootpxe</artifactId>
+    <version>2.2.3-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <ericsson.scm.url>scm:git:ssh://gerrit.ericsson.se:29418/LITP/com.ericsson.oss.litp/${project.artifactId}</ericsson.scm.url>
+    </properties>
+
+    <scm>
+        <connection>${ericsson.scm.url}</connection>
+        <developerConnection>${ericsson.scm.url}</developerConnection>
+        <tag>ERIClitpbootpxe-2.2.1</tag>
+    </scm>
+
+    <modules>
+        <module>ERIClitpbootpxe_CXP9039031</module>
+    </modules>
+
+</project>

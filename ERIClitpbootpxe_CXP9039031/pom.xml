@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ericsson.oss.litp</groupId>
+        <artifactId>ERIClitpbootpxe</artifactId>
+        <version>2.2.3-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>ERIClitpbootpxe_CXP9039031</artifactId>
+    <name>[${project.parent.artifactId}] ${project.artifactId} RPM module</name>
+    <description>LITP bootpxe plugin</description>
+    <packaging>rpm</packaging>
+
+    <properties>
+        <!-- publishes the rpm module to the ci portal -->
+        <publish_artifact>true</publish_artifact>
+        <bom_version>RELEASE</bom_version>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- Dependencies -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <!-- Build the RPM -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <inherited>true</inherited>
+                <configuration>
+                    <group>ERI-NMS</group>
+                    <requires>
+                        <require>python &gt;= 2.7</require>
+                        <require>ERIClitpcore_CXP9030418 &gt;= ${litpcore_version}</require>
+                        <require>ERIClitpbmcapi_CXP9030611 &gt;= ${litpbmcapi_version}</require>
+                        <require>EXTRlitppythonredfish_CXP9039027 &gt;= ${pythonredfish_version}</require>
+                    </requires>
+                </configuration>
+            </plugin>
+            <!-- Test execution-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>nosetests</id>
+                        <phase>test</phase>
+                        <configuration>
+                            <environmentVariables>
+                                <PYTHONPATH>
+                                    src:target/deps/opt/ericsson/nms/litp/lib:target/deps/usr/lib/python2.6/site-packages:${env.PYTHONPATH}
+                                </PYTHONPATH>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pylint</id>
+                        <phase>test</phase>
+                        <configuration>
+                            <environmentVariables>
+                                <PYTHONPATH>
+                                    ../src:../test:../target/deps/opt/ericsson/nms/litp/lib:./target/sphinx:../target/deps/usr/lib/python2.6/site-packages:${env.PYTHONPATH}
+                                </PYTHONPATH>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>runats</id>
+                        <phase>test</phase>
+                        <configuration>
+                            <environmentVariables>
+                                <PYTHONPATH>
+                                    ../target/deps/opt/ericsson/nms/litp/lib:../target/deps/usr/lib/python2.6/site-packages:${env.PYTHONPATH}
+                                </PYTHONPATH>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Profile with explicit dependencies -->
+        <profile>
+            <id>current-dep</id>
+            <activation>
+                <property>
+                    <name>!UsingLatest</name>
+                </property>
+            </activation>
+            <properties>
+                <litpcore_version>2.2.1</litpcore_version>
+                <litpbmcapi_version>2.2.0</litpbmcapi_version>
+                <pythonredfish_version>2.2.0</pythonredfish_version>
+                <litpnetworkapi_version>2.2.0</litpnetworkapi_version>
+                <litpvolmgrapi_version>2.2.0</litpvolmgrapi_version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.ericsson.nms.litp</groupId>
+                    <artifactId>ERIClitpcore_CXP9030418</artifactId>
+                    <version>${litpcore_version}</version>
+                    <type>rpm</type>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.nms.litp</groupId>
+                    <artifactId>ERIClitpbmcapi_CXP9030611</artifactId>
+                    <version>${litpbmcapi_version}</version>
+                    <type>rpm</type>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.nms.litp</groupId>
+                    <artifactId>ERIClitpnetworkapi_CXP9030514</artifactId>
+                    <version>${litpnetworkapi_version}</version>
+                    <type>rpm</type>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.nms.litp</groupId>
+                    <artifactId>ERIClitpvolmgrapi_CXP9030947</artifactId>
+                    <version>${litpvolmgrapi_version}</version>
+                    <type>rpm</type>
+                </dependency>
+            </dependencies>
+        </profile>
+        <!-- Profile with latest dependencies -->
+        <profile>
+            <id>latest-dep</id>
+            <properties>
+                <UsingLatest>true</UsingLatest>
+            </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.ericsson.litp</groupId>
+                        <artifactId>ci-bom</artifactId>
+                        <version>${bom_version}</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+            <dependencies>
+                <dependency>
+                    <groupId>com.ericsson.nms.litp</groupId>
+                    <artifactId>ERIClitpcore_CXP9030418</artifactId>
+                    <type>rpm</type>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.nms.litp</groupId>
+                    <artifactId>ERIClitpbmcapi_CXP9030611</artifactId>
+                    <type>rpm</type>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.nms.litp</groupId>
+                    <artifactId>ERIClitpnetworkapi_CXP9030514</artifactId>
+                    <type>rpm</type>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.nms.litp</groupId>
+                    <artifactId>ERIClitpvolmgrapi_CXP9030947</artifactId>
+                    <type>rpm</type>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>

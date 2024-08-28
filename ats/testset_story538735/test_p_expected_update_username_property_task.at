@@ -1,0 +1,27 @@
+runLitpScript setup.inc
+litpcrypt set key-for-bob not_bob 'notbobspassword'
+
+assertState -p /infrastructure/systems/system_1/bmc Initial
+assertState -p /infrastructure/systems/system_2/bmc Initial
+assertState -p /deployments/local_vm/clusters/cluster1/nodes/testNode1/system/bmc Initial
+assertState -p /deployments/local_vm/clusters/cluster1/nodes/testNode2/system/bmc Initial
+
+litp create_plan
+assertPlanState initial
+
+litp run_plan
+
+assertState -p /infrastructure/systems/system_1/bmc Applied
+assertState -p /infrastructure/systems/system_2/bmc Applied
+assertState -p /deployments/local_vm/clusters/cluster1/nodes/testNode1/system/bmc Applied
+assertState -p /deployments/local_vm/clusters/cluster1/nodes/testNode2/system/bmc Applied
+
+litp update -p /infrastructure/systems/system_1/bmc -o username=not_bob
+
+assertState -p /infrastructure/systems/system_1/bmc Updated
+assertState -p /infrastructure/systems/system_2/bmc Applied
+assertState -p /deployments/local_vm/clusters/cluster1/nodes/testNode1/system/bmc Updated
+assertState -p /deployments/local_vm/clusters/cluster1/nodes/testNode2/system/bmc Applied
+
+litp create_plan
+assertTaskInPlan _update_username_property /deployments/local_vm/clusters/cluster1/nodes/testNode1/system/bmc

@@ -1,0 +1,31 @@
+runLitpScript setup_ms.inc
+
+# Setup nodes
+litp create -t node -p /deployments/local_vm/clusters/cluster1/nodes/testNode1 -o hostname=testNode1
+litp create -t node -p /deployments/local_vm/clusters/cluster1/nodes/testNode2 -o hostname=testNode2
+
+litp inherit -p /deployments/local_vm/clusters/cluster1/nodes/testNode1/system -s /infrastructure/systems/system_1
+litp inherit -p /deployments/local_vm/clusters/cluster1/nodes/testNode1/routes/default -s /infrastructure/networking/routes/default
+litp inherit -p /deployments/local_vm/clusters/cluster1/nodes/testNode1/storage_profile -s /infrastructure/storage/storage_profiles/profile_1
+litp inherit -p /deployments/local_vm/clusters/cluster1/nodes/testNode1/os -s /software/profiles/rhel_6_10
+
+litp inherit -p /deployments/local_vm/clusters/cluster1/nodes/testNode2/system -s /infrastructure/systems/system_2
+litp inherit -p /deployments/local_vm/clusters/cluster1/nodes/testNode2/routes/default -s /infrastructure/networking/routes/default
+litp inherit -p /deployments/local_vm/clusters/cluster1/nodes/testNode2/storage_profile -s /infrastructure/storage/storage_profiles/profile_1
+litp inherit -p /deployments/local_vm/clusters/cluster1/nodes/testNode2/os -s /software/profiles/rhel_6_10
+
+litp create -t eth -p /deployments/local_vm/clusters/cluster1/nodes/testNode1/network_interfaces/eth0 -o device_name=eth0 macaddress=08:00:27:3A:F7:53 ipaddress=192.168.56.108 network_name=mgmt
+litp create -t eth -p /deployments/local_vm/clusters/cluster1/nodes/testNode2/network_interfaces/eth0 -o device_name=eth0 macaddress=08:00:27:36:7C:64 ipaddress=192.168.56.109 network_name=mgmt
+
+## Create plan
+litp create_plan
+
+# Step 1
+litp create_plan
+assertPlanState initial
+
+# Step 2
+assertState -p /deployments/local_vm/clusters/cluster1/nodes/testNode1/system/bmc Initial
+assertState -p /deployments/local_vm/clusters/cluster1/nodes/testNode2/system/bmc Initial
+assertTaskInPlan _exec_pxeboot_request /deployments/local_vm/clusters/cluster1/nodes/testNode1/system/bmc
+assertTaskInPlan _exec_pxeboot_request /deployments/local_vm/clusters/cluster1/nodes/testNode2/system/bmc

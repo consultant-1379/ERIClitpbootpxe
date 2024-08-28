@@ -1,0 +1,14 @@
+*.pyc
+*.swp
+.project
+.pydevproject
+.coverage
+target
+coverage.xml
+nosetests.xml
+tags
+
+# IntelliJ IDEA files
+*.iml
+.idea
+.idea/*
